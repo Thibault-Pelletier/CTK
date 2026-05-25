@@ -60,9 +60,10 @@ public:
 
   /// Initialize python context considering the initializationFlags.
   /// Return \a True if python has been successfully initialized.
+  /// \param enableThreadSupport If true, enable PythonQt thread support (false by default).
   /// \sa setInitializationFlags, mainContext, isPythonInitialized
   /// \sa preInitialization, executeInitializationScripts, pythonPreInitialized, pythonInitialized
-  bool initialize();
+  bool initialize(bool enableThreadSupport=false);
 
   /// Return a reference to the python main context.
   /// Calling this function implicitly call initialize() if it hasn't been done.
@@ -187,7 +188,7 @@ protected Q_SLOTS:
 
 protected:
 
-  void initPythonQt(int flags);
+  void initPythonQt(int flags, bool enableThreadSupport=false);
 
   virtual QStringList     pythonPaths();
 

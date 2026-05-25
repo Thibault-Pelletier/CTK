@@ -209,6 +209,7 @@ bool ctkPythonConsoleCompleterPrivate::isBuiltInFunction(const QString &pythonFu
 //---------------------------------------------------------------------------
 int ctkPythonConsoleCompleterPrivate::parameterCountBuiltInFunction(const QString& pythonFunctionName)
 {
+  PYTHONQT_GIL_SCOPE;
   int parameterCount = 0;
   PyObject* pFunction = this->PythonManager.pythonModule(pythonFunctionName);
   if (pFunction)
@@ -237,6 +238,7 @@ int ctkPythonConsoleCompleterPrivate::parameterCountBuiltInFunction(const QStrin
 //----------------------------------------------------------------------------
 int ctkPythonConsoleCompleterPrivate::parameterCountUserDefinedFunction(const QString& pythonFunctionName)
 {
+  PYTHONQT_GIL_SCOPE;
   int parameterCount = 0;
   PyObject* pFunction = this->PythonManager.pythonModule(pythonFunctionName);
   if (PyCallable_Check(pFunction))
@@ -259,6 +261,7 @@ int ctkPythonConsoleCompleterPrivate::parameterCountUserDefinedFunction(const QS
 //----------------------------------------------------------------------------
 int ctkPythonConsoleCompleterPrivate::parameterCountUserDefinedClassFunction(const QString& pythonFunctionName)
 {
+  PYTHONQT_GIL_SCOPE;
   int parameterCount = 0;
   PyObject* pFunction = this->PythonManager.pythonObject(pythonFunctionName);
   if (PyCallable_Check(pFunction))
@@ -281,6 +284,7 @@ int ctkPythonConsoleCompleterPrivate::parameterCountUserDefinedClassFunction(con
 //----------------------------------------------------------------------------
 int ctkPythonConsoleCompleterPrivate::parameterCountFromDocumentation(const QString& pythonFunctionPath)
 {
+  PYTHONQT_GIL_SCOPE;
   int parameterCount = 0;
   PyObject* pFunction = this->PythonManager.pythonObject(pythonFunctionPath);
   if (pFunction)
@@ -546,6 +550,7 @@ ctkPythonConsolePrivate::~ctkPythonConsolePrivate()
 //----------------------------------------------------------------------------
 void ctkPythonConsolePrivate::initializeInteractiveConsole()
 {
+  PYTHONQT_GIL_SCOPE;
   Q_ASSERT(this->PythonManager);
 
   // set up the code.InteractiveConsole instance that we'll use.
@@ -568,6 +573,7 @@ void ctkPythonConsolePrivate::initializeInteractiveConsole()
 //----------------------------------------------------------------------------
 bool ctkPythonConsolePrivate::push(const QString& code)
 {
+  PYTHONQT_GIL_SCOPE;
   Q_ASSERT(this->PythonManager);
 
   bool ret_value = false;
@@ -680,6 +686,7 @@ void ctkPythonConsole::initialize(ctkAbstractPythonManager* newPythonManager)
 //----------------------------------------------------------------------------
 QString ctkPythonConsole::ps1() const
 {
+  PYTHONQT_GIL_SCOPE;
   PyObject * ps1 = PySys_GetObject(const_cast<char*>("ps1"));
   const char * ps1_str = PyUnicode_AsUTF8(ps1);
   return QLatin1String(ps1_str);
@@ -688,12 +695,14 @@ QString ctkPythonConsole::ps1() const
 //----------------------------------------------------------------------------
 void ctkPythonConsole::setPs1(const QString& newPs1)
 {
+  PYTHONQT_GIL_SCOPE;
   PySys_SetObject(const_cast<char*>("ps1"), PyUnicode_FromString(newPs1.toLatin1().data()));
 }
 
 //----------------------------------------------------------------------------
 QString ctkPythonConsole::ps2() const
 {
+  PYTHONQT_GIL_SCOPE;
   PyObject * ps2 = PySys_GetObject(const_cast<char*>("ps2"));
   const char * ps2_str = PyUnicode_AsUTF8(ps2);
   return QLatin1String(ps2_str);
@@ -702,6 +711,7 @@ QString ctkPythonConsole::ps2() const
 //----------------------------------------------------------------------------
 void ctkPythonConsole::setPs2(const QString& newPs2)
 {
+  PYTHONQT_GIL_SCOPE;
   PySys_SetObject(const_cast<char*>("ps2"), PyUnicode_FromString(newPs2.toLatin1().data()));
 }
 

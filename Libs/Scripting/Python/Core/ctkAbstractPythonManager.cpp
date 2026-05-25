@@ -109,12 +109,12 @@ int ctkAbstractPythonManager::initializationFlags()const
 }
 
 //-----------------------------------------------------------------------------
-bool ctkAbstractPythonManager::initialize()
+bool ctkAbstractPythonManager::initialize(bool enableThreadSupport)
 {
   Q_D(ctkAbstractPythonManager);
   if (!PythonQt::self())
   {
-    this->initPythonQt(d->PythonQtInitializationFlags);
+    this->initPythonQt(d->PythonQtInitializationFlags, enableThreadSupport);
   }
   return this->isPythonInitialized();
 }
@@ -122,6 +122,7 @@ bool ctkAbstractPythonManager::initialize()
 //-----------------------------------------------------------------------------
 PythonQtObjectPtr ctkAbstractPythonManager::mainContext()
 {
+  PYTHONQT_GIL_SCOPE;
   bool initialized = this->initialize();
   if (initialized)
   {
@@ -131,11 +132,13 @@ PythonQtObjectPtr ctkAbstractPythonManager::mainContext()
 }
 
 //-----------------------------------------------------------------------------
-void ctkAbstractPythonManager::initPythonQt(int flags)
+void ctkAbstractPythonManager::initPythonQt(int flags, bool enableThreadSupport)
 {
   Q_D(ctkAbstractPythonManager);
 
   PythonQt::init(flags);
+  PythonQt::setEnableThreadSupport(enableThreadSupport);
+  PYTHONQT_GIL_SCOPE;
 
   // Python maps SIGINT (control-c) to its own handler.  We will remap it
   // to the default so that control-c works.
@@ -229,6 +232,7 @@ void ctkAbstractPythonManager::registerPythonQtDecorator(QObject* decorator)
     qWarning() << Q_FUNC_INFO << " failed: PythonQt is not initialized";
     return;
   }
+  PYTHONQT_GIL_SCOPE;
   PythonQt::self()->addDecorators(decorator);
 }
 
@@ -240,6 +244,7 @@ void ctkAbstractPythonManager::registerClassForPythonQt(const QMetaObject* metao
     qWarning() << Q_FUNC_INFO << " failed: PythonQt is not initialized";
     return;
   }
+  PYTHONQT_GIL_SCOPE;
   PythonQt::self()->registerClass(metaobject);
 }
 
@@ -251,6 +256,7 @@ void ctkAbstractPythonManager::registerCPPClassForPythonQt(const char* name)
     qWarning() << Q_FUNC_INFO << " failed: PythonQt is not initialized";
     return;
   }
+  PYTHONQT_GIL_SCOPE;
   PythonQt::self()->registerCPPClass(name);
 }
 
@@ -284,6 +290,7 @@ bool ctkAbstractPythonManager::redirectStdOutCallbackEnabled()const
     qWarning() << Q_FUNC_INFO << " failed: PythonQt is not initialized";
     return false;
   }
+  PYTHONQT_GIL_SCOPE;
   return PythonQt::self()->redirectStdOutCallbackEnabled();
 }
 
@@ -295,6 +302,7 @@ void ctkAbstractPythonManager::setRedirectStdOutCallbackEnabled(bool value)
     qWarning() << Q_FUNC_INFO << " failed: PythonQt is not initialized";
     return;
   }
+  PYTHONQT_GIL_SCOPE;
   PythonQt::self()->setRedirectStdOutCallbackEnabled(value);
 }
 
@@ -302,6 +310,7 @@ void ctkAbstractPythonManager::setRedirectStdOutCallbackEnabled(bool value)
 QVariant ctkAbstractPythonManager::executeString(const QString& code,
                                                  ctkAbstractPythonManager::ExecuteStringMode mode)
 {
+  PYTHONQT_GIL_SCOPE;
   int start = -1;
   switch(mode)
   {
@@ -323,6 +332,7 @@ QVariant ctkAbstractPythonManager::executeString(const QString& code,
 //-----------------------------------------------------------------------------
 void ctkAbstractPythonManager::executeFile(const QString& filename)
 {
+  PYTHONQT_GIL_SCOPE;
   PythonQtObjectPtr main = ctkAbstractPythonManager::mainContext();
   if (main)
   {
@@ -363,6 +373,7 @@ QStringList ctkAbstractPythonManager::dir_object(PyObject* object,
   {
     return results;
   }
+  PYTHONQT_GIL_SCOPE;
   PyObject* keys = PyObject_Dir(object);
   if (keys)
   {
@@ -447,6 +458,7 @@ QStringList ctkAbstractPythonManager::pythonAttributes(const QString& pythonVari
                                                        const QString& module,
                                                        bool appendParenthesis) const
 {
+  PYTHONQT_GIL_SCOPE;
   Q_ASSERT(PyThreadState_GET()->interp);
   PyObject* dict = PyImport_GetModuleDict();
 
@@ -594,6 +606,7 @@ QStringList ctkAbstractPythonManager::pythonAttributes(const QString& pythonVari
 //-----------------------------------------------------------------------------
 PyObject* ctkAbstractPythonManager::pythonObject(const QString& variableNameAndFunction)
 {
+  PYTHONQT_GIL_SCOPE;
   QStringList variableNameAndFunctionList = variableNameAndFunction.split(".");
   QString compareFunction = variableNameAndFunctionList.last();
   variableNameAndFunctionList.removeLast();
@@ -661,6 +674,7 @@ PyObject* ctkAbstractPythonManager::pythonObject(const QString& variableNameAndF
 //-----------------------------------------------------------------------------
 PyObject* ctkAbstractPythonManager::pythonModule(const QString& module)
 {
+  PYTHONQT_GIL_SCOPE;
   PyObject* dict = PyImport_GetModuleDict();
   PyObject* object = 0;
   PyObject* prevObject = 0;
@@ -697,6 +711,7 @@ PyObject* ctkAbstractPythonManager::pythonModule(const QString& module)
 //-----------------------------------------------------------------------------
 void ctkAbstractPythonManager::addObjectToPythonMain(const QString& name, QObject* obj)
 {
+  PYTHONQT_GIL_SCOPE;
   PythonQtObjectPtr main = ctkAbstractPythonManager::mainContext();
   if (main && obj)
   {
@@ -718,6 +733,7 @@ void ctkAbstractPythonManager::addWrapperFactory(PythonQtForeignWrapperFactory* 
 //-----------------------------------------------------------------------------
 QVariant ctkAbstractPythonManager::getVariable(const QString& name)
 {
+  PYTHONQT_GIL_SCOPE;
   PythonQtObjectPtr main = ctkAbstractPythonManager::mainContext();
   if (main)
   {
